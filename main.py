@@ -3,20 +3,30 @@ import random
 import json
 import pymysql
 
-connectivity = pymysql.connect(host="sql6.freesqldatabase.com",
-                               user="sql6130708",
-                               password="THC8Cqs1Kq",
-                               db="sql6130708",
+connectivity = pymysql.connect(host="localhost",
+                               user="root",
+                               password="",
+                               db="mydb",
                                cursorclass=pymysql.cursors.DictCursor)
-
+current_q = 1
+username = 'Ilana'
 try:
     with connectivity.cursor() as cursor:
-        sql = "SELECT * FROM users WHERE name={}".format(username)
+
+        sql = "SELECT * FROM answers WHERE id_q={}".format(current_q)
+
+        print("blah")
         cursor.execute(sql)
-        user1 = cursor.fetchall()
-        print(user1)
+        options = cursor.fetchall()
+        firstop = options[0]['text_ans']
+        print(firstop)
+        secop = options[1]['text_ans']
+        print(secop)
+        thop = options[2]['text_ans']
+        print(thop)
+        print(options)
 except:
-    print("falied")
+    print("failed")
 
 
 @route("/", method="GET")
@@ -67,23 +77,22 @@ def init_data(cursor,  username):
     # get infos of current user to use and updqate in every step
     user1 = get_user(cursor, username)
 
-    sql = "SELECT * FROM users WHERE name={}".format(username)
+    sql = "SELECT * FROM users WHERE name='{}'".format(username)
     cursor.execute(sql)
     user1 = cursor.fetchall()
+    current_q = user1[0]['id_q']
 
-    question = get_question(cursor, user1['current_q'])
-
-    sql = "SELECT * FROM questions  WHERE question_id IS user[current_q]".format(username)
+    sql = "SELECT * FROM questions WHERE id_q={}".format(current_q)
     cursor.execute(sql)
-    result = cursor.fetchall()
+    question_row = cursor.fetchall()
+    image = question_row[0]['image']
+    text = question_row[0]['text_q']
 
-    options = get_options(cursor, user1['current_q'])
-
-    sql = "SELECT * FROM users WHERE name={}".format(username)
+    sql = "SELECT * FROM answers WHERE id_q={}".format(current_q)
     cursor.execute(sql)
-    result = cursor.fetchall()
+    options = cursor.fetchall()
 
-    return user1, question, options
+    return user1, question_row, options
 
 
 def get_user(cursor, username):
