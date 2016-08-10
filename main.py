@@ -9,6 +9,15 @@ connectivity = pymysql.connect(host="sql6.freesqldatabase.com",
                                db="sql6130708",
                                cursorclass=pymysql.cursors.DictCursor)
 
+try:
+    with connectivity.cursor() as cursor:
+        sql = "SELECT * FROM users WHERE name={}".format(username)
+        cursor.execute(sql)
+        user1 = cursor.fetchall()
+        print(user1)
+except:
+    print("falied")
+
 
 @route("/", method="GET")
 def index():
@@ -78,10 +87,15 @@ def init_data(cursor,  username):
 
 
 def get_user(cursor, username):
-    sql = "SELECT * FROM users WHERE name={}".format(username)
-    cursor.execute(sql)
-    result = cursor.fetchall()
-    return result
+    insert_sql = " INSERT INTO 'users'( 'name','current_q') VALUES ({0},\'{1}\')".format(username, 1)
+    cursor.execute(insert_sql)
+    connectivity.commit()
+
+    #
+    # sql = "SELECT * FROM users WHERE name={}".format(username)
+    # cursor.execute(sql)
+    # result = cursor.fetchall()
+    # return result
 
 
 @route("/story", method="POST")
