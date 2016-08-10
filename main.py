@@ -25,7 +25,6 @@ try:
         thop = options[2]['text_ans']
         print(thop)
         print(options)
-        print(options)
 except:
     print("failed")
 
