@@ -29,14 +29,11 @@ def start():
         user, question, options = init_data(cursor,  username)
     connectivity.close()
 
-    return json.dumps({"user": result["name"],
-                       "id": current_adv_id,
-                       "text_q": result["text_q"],
-                       "image": result["image"],
-                       "options": next_steps_results
+    return json.dumps({"name": user1["name"],
+
                        })
 
-    user_id = result[id]
+    user_id = user[id]
     current_story_id = 0  # todo change
     next_steps_results = [
         {"id": 1, "option_text": "I fight it"},
@@ -46,12 +43,8 @@ def start():
     ]
 
     # todo add the next step based on db
-    return json.dumps({"user": result['id'],
-                       "adventure": current_adv_id,
-                       "current": current_story_id,
-                       "text": result["text_q"],
-                       "image": result["image"],
-                       "options": next_steps_results
+    return json.dumps({"name": user['name'],
+
                        })
 
 
@@ -64,11 +57,22 @@ def init_user(cursor, username):
 def init_data(cursor,  username):
     # get infos of current user to use and updqate in every step
     user1 = get_user(cursor, username)
+
+    sql = "SELECT * FROM users WHERE name={}".format(username)
+    cursor.execute(sql)
+    user1 = cursor.fetchall()
+
     question = get_question(cursor, user1['current_q'])
 
+    sql = "SELECT * FROM questions  WHERE question_id IS user[current_q]".format(username)
+    cursor.execute(sql)
+    result = cursor.fetchall()
 
     options = get_options(cursor, user1['current_q'])
 
+    sql = "SELECT * FROM users WHERE name={}".format(username)
+    cursor.execute(sql)
+    result = cursor.fetchall()
 
     return user1, question, options
 
