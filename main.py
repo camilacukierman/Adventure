@@ -1,6 +1,13 @@
 from bottle import route, run, template, static_file, request
 import random
 import json
+import pymysql
+
+connectivity = pymysql.connect(host="sql6.freesqldatabase.com",
+                               user="sql6130708",
+                               password="THC8Cqs1Kq",
+                               db="sql6130708",
+                               cursorclass=pymysql.cursors.DictCursor)
 
 
 @route("/", method="GET")
@@ -13,46 +20,94 @@ def start():
     username = request.POST.get("name")
     current_adv_id = request.POST.get("adventure_id")
 
+    # name = {"name":''}
+    with connectivity.cursor() as cursor:
+        user = get_user(cursor, username)
+        if user is None:
+            init_user(cursor, username)
 
-    user_id = 0 #todo check if exists and if not create it
-    current_story_id = 0 #todo change
+        user, question, options = init_data(cursor,  username)
+    connectivity.close()
+
+    return json.dumps({"user": result["name"],
+                       "id": current_adv_id,
+                       "text_q": result["text_q"],
+                       "image": result["image"],
+                       "options": next_steps_results
+                       })
+
+    user_id = result[id]
+    current_story_id = 0  # todo change
     next_steps_results = [
         {"id": 1, "option_text": "I fight it"},
         {"id": 2, "option_text": "I give him 10 coins"},
         {"id": 3, "option_text": "I tell it that I just want to go home"},
         {"id": 4, "option_text": "I run away quickly"}
-        ]
+    ]
 
-    #todo add the next step based on db
-    return json.dumps({"user": user_id,
+    # todo add the next step based on db
+    return json.dumps({"user": result['id'],
                        "adventure": current_adv_id,
                        "current": current_story_id,
-                       "text": "You meet a mysterious creature in the woods, what do you do?",
-                       "image": "troll.png",
+                       "text": result["text_q"],
+                       "image": result["image"],
                        "options": next_steps_results
                        })
+
+
+def init_user(cursor, username):
+    insert_sql = " INSERT INTO 'users'( 'name','current_q') VALUES ({0},\'{1}\')".format(username, 1)
+    cursor.execute(insert_sql)
+    connectivity.commit()
+
+
+def init_data(cursor,  username):
+    # get infos of current user to use and updqate in every step
+    user1 = get_user(cursor, username)
+    question = get_question(cursor, user1['current_q'])
+
+
+    options = get_options(cursor, user1['current_q'])
+
+
+    return user1, question, options
+
+
+def get_user(cursor, username):
+    sql = "SELECT * FROM users WHERE name={}".format(username)
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    return result
 
 
 @route("/story", method="POST")
 def story():
     user_id = request.POST.get("user")
     current_adv_id = request.POST.get("adventure")
-    next_story_id = request.POST.get("next") #this is what the user chose - use it!
+    next_story_id = request.POST.get("next")  # this is what the user chose - use it!
+    update_user(...)
+    result, question, options = init_data(cursor, result, username)
     next_steps_results = [
         {"id": 1, "option_text": "I run!"},
         {"id": 2, "option_text": "I hide!"},
         {"id": 3, "option_text": "I sleep!"},
         {"id": 4, "option_text": "I fight!"}
-        ]
-    random.shuffle(next_steps_results) #todo change - used only for demonstration purpouses
+    ]
+    random.shuffle(next_steps_results)  # todo change - used only for demonstration purpouses
 
-    #todo add the next step based on db
-    return json.dumps({"user": user_id,
+    # todo add the next step based on db
+    return json.dumps({"user": result[""],
                        "adventure": current_adv_id,
-                       "text": "New scenario! What would you do?",
-                       "image": "choice.jpg",
+                       "text_q": result["text_q"],
+                       "image": result["image"],
                        "options": next_steps_results
                        })
+
+
+# "adventure": current_adv_id,
+# "text": "New scenario! What would you do?",
+# "image": "choice.jpg",
+# "options": next_steps_results
 
 @route('/js/<filename:re:.*\.js$>', method='GET')
 def javascripts(filename):
@@ -68,9 +123,10 @@ def stylesheets(filename):
 def images(filename):
     return static_file(filename, root='images')
 
+
 def main():
     run(host='localhost', port=9000)
 
+
 if __name__ == '__main__':
     main()
-
