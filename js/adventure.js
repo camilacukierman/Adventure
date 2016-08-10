@@ -29,15 +29,16 @@ Adventures.bindErrorHandlers = function () {
 //The core function of the app, sends the user's choice and then parses the results to the server and handling the response
 Adventures.chooseOption = function(){
     Adventures.currentStep = $(this).val();
+    console.log($(this))
     $.ajax("/story",{
         type: "POST",
-        data: {"user": Adventures.currentUser,
+        data: {
+            "user": Adventures.currentUser,
             "adventure": Adventures.currentAdventure,
             "next": Adventures.currentStep},
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
-            console.log(data);
             $(".greeting-text").hide();
             Adventures.write(data);
         }
@@ -49,8 +50,8 @@ Adventures.write = function (message) {
     $(".situation-text").text(message["text"]).show();
     for(var i=0;i<message['options'].length;i++){
         var opt = $("#option_" + (i+1));
-        opt.text(message['options'][i]['option_text']);
-        opt.prop("value", message['options'][i]['id']);
+        opt.text(message['options'][i]['text_ans']);
+        opt.prop("value", message['options'][i]['next_q']);
     }
     Adventures.setImage(message["image"]);
 };
@@ -85,14 +86,13 @@ Adventures.initAdventure = function(){
 
     $.ajax("/start",{
         type: "POST",
-        data: {"user":
-            $("#nameField").val(),
+        data: {
+            "user": $("#nameField").val(),
             "adventure_id": $(this).val()
         },
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
-            console.log(data);
             Adventures.write(data);
             $(".adventure").show();
             $(".welcome-screen").hide();
