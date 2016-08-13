@@ -96,6 +96,10 @@ Adventures.initAdventure = function(){
             Adventures.write(data);
             $(".adventure").show();
             $(".welcome-screen").hide();
+            Adventures.currentAdventure = data[w];
+            Adventures.currentStep = data['current'];
+            Adventures.currentUser = data['user'];
+
         }
     });
 };

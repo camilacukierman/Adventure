@@ -44,13 +44,13 @@ def start():
             user = init_user(cursor, username)
 
         question_row, options = get_data(cursor, 1, username)
-        connectivity.close()
+
 
     current_story_id = 0  # todo change
 
 
 # todo add the next step based on db
-    return json.dumps({"user": user['id_users'],
+    return json.dumps({"user": user['name'],
                    "adventure": current_adv_id,
                    "current": user['id_q'],
                    "text": question_row['text_q'],
@@ -69,13 +69,11 @@ def init_user(cursor, username):
 
 def get_data(cursor, result, username):
     # get infos of current user to use and updqate in every step
-    current_q = get_user(cursor, username)['id_q']
-
-    sql = "SELECT * FROM questions WHERE id_q={}".format(current_q)
+    sql = "SELECT * FROM questions WHERE id_q={}".format(result)
     cursor.execute(sql)
     question_row = cursor.fetchone()
 
-    sql = "SELECT * FROM answers WHERE id_q={}".format(current_q)
+    sql = "SELECT * FROM answers WHERE id_q={}".format(result)
     cursor.execute(sql)
     options = cursor.fetchall()
 
@@ -94,20 +92,23 @@ def get_user(cursor, username):
 
 @route("/story", method="POST")
 def story():
-    user_id = request.POST.get("user")
+    username = request.POST.get("user")
     current_adv_id = request.POST.get("adventure")
     next_story_id = request.POST.get("next")
     # update_user(...)
-    question, options = get_data(cursor, result, username)
-    next_steps_results = []
-    random.shuffle(next_steps_results)  # todo change - used only for demonstration purpouses
+    with connectivity.cursor() as cursor:
+        question, options = get_data(cursor, next_story_id, username)
+
+    # next_steps_results = []
+    # random.shuffle(options)  # todo change - used only for demonstration purpouses
 
     # todo add the next step based on db
-    return json.dumps({"user": result[""],
+    return json.dumps({"user": username,
                        "adventure": current_adv_id,
-                       "text_q": result["text_q"],
-                       "image": result["image"],
-                       "options": next_steps_results
+                       "current": next_story_id,
+                       "text": question['text_q'],
+                       "image": question['image'],
+                       "options": options
                        })
 
 
