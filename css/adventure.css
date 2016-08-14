@@ -34,6 +34,9 @@ text-align:center;
 .situation-text{
     display:block;
 }
+img #situation-image .situation-image {
+    height: 200px;
+}
 .name-text{
     display: inline-block;
 }
