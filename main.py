@@ -4,11 +4,13 @@ import json
 import pymysql
 import os
 
-connectivity = pymysql.connect(host="localhost",
-                               user="root",
-                               password="",
-                               db="adventure",
+connectivity = pymysql.connect(host="us-cdbr-iron-east-04.cleardb.net",
+                               user="b32cd531a68129",
+                               password="f4c798fc",
+                               db="heroku_0e2c7680e7cdd9b",
                                cursorclass=pymysql.cursors.DictCursor)
+
+
 # current_q = 1
 # username = 'Yippy'
 # try:
@@ -39,25 +41,23 @@ def start():
     # name = {"name":''}
     with connectivity.cursor() as cursor:
         user = get_user(cursor, username)
-        #print(user)
+        # print(user)
         if user is None:
             print("something")
             user = init_user(cursor, username)
 
         question_row, options = get_data(cursor, 1, username)
 
-
     current_story_id = 0  # todo change
 
-
-# todo add the next step based on db
+    # todo add the next step based on db
     return json.dumps({"user": user['name'],
-                   "adventure": current_adv_id,
-                   "current": user['id_q'],
-                   "text": question_row['text_q'],
-                   "image": question_row['image'],
-                   "options": options
-                   })
+                       "adventure": current_adv_id,
+                       "current": user['id_q'],
+                       "text": question_row['text_q'],
+                       "image": question_row['image'],
+                       "options": options
+                       })
 
 
 def init_user(cursor, username):
@@ -80,6 +80,7 @@ def get_data(cursor, result, username):
 
     return question_row, options
 
+
 #
 def get_user(cursor, username):
     sql = "SELECT * FROM users WHERE name='{}'".format(username)
@@ -88,7 +89,6 @@ def get_user(cursor, username):
     print(user)
     return user
     # connectivity.commit()
-
 
 
 @route("/story", method="POST")
@@ -134,9 +134,10 @@ def images(filename):
 
 
 def main():
-    run(host='localhost', port=9000)
-    # run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-
+    if os.environ.get('APP_LOCATION') == 'heroku':
+        run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    else:
+        run(host='localhost', port=8080, debug=True)
 
 
 if __name__ == '__main__':
