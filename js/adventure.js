@@ -54,11 +54,17 @@ Adventures.chooseOption = function(){
 };
 
 Adventures.setEnergy = function(energy_total){
+        if (energy_total== undefined){
+        energy_total = 100;
+    }
     $(".user-energy").text("Total Energy: "+ energy_total);
     console.log('sup');
 }
 
 Adventures.setBodyTemp = function(bodytemp_total){
+    if (bodytemp_total == undefined){
+        bodytemp_total = 100;
+    }
     $(".user-bodytemperature").text("Total Body Temperature: "+bodytemp_total);
     console.log('dude');
 }

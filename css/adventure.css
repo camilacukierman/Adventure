@@ -68,3 +68,11 @@ img #situation-image .situation-image {
     left: 0px;
     margin: 5px;
 }
+
+.user-bodytemperature{
+    font-size: 12px;
+}
+
+.user-energy{
+   font-size: 12px;
+}
