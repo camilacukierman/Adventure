@@ -2,6 +2,7 @@ from bottle import route, run, template, static_file, request
 import random
 import json
 import pymysql
+import os
 
 connectivity = pymysql.connect(host="localhost",
                                user="root",
@@ -133,7 +134,9 @@ def images(filename):
 
 
 def main():
-    run(host='localhost', port=9000)
+    #run(host='localhost', port=9000)
+    run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 
 
 if __name__ == '__main__':
