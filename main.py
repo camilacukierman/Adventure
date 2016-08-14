@@ -2,11 +2,12 @@ from bottle import route, run, template, static_file, request
 import random
 import json
 import pymysql
+import os
 
 connectivity = pymysql.connect(host="localhost",
                                user="root",
                                password="",
-                               db="mydb",
+                               db="adventure",
                                cursorclass=pymysql.cursors.DictCursor)
 # current_q = 1
 # username = 'Yippy'
@@ -39,7 +40,7 @@ def start():
     with connectivity.cursor() as cursor:
         user = get_user(cursor, username)
         #print(user)
-        if user is ():
+        if user is None:
             print("something")
             user = init_user(cursor, username)
 
@@ -60,7 +61,7 @@ def start():
 
 
 def init_user(cursor, username):
-    sql = " INSERT INTO users (name, energy_total, bodytemp_total, id_q) VALUES ('{}', 100, 100, 1)".format(username)
+    sql = "INSERT INTO users (name, energy_total, bodytemp_total, id_q) VALUES (\'{}\', 100, 100, 1)".format(username)
     cursor.execute(sql)
     user = get_user(cursor, username)
     connectivity.commit()
@@ -134,6 +135,8 @@ def images(filename):
 
 def main():
     run(host='localhost', port=9000)
+    # run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
 
 
 if __name__ == '__main__':
