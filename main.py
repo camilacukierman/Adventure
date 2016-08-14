@@ -26,6 +26,8 @@ connectivity = pymysql.connect(host="localhost",
 #     print("failed")
 
 
+
+
 @route("/", method="GET")
 def index():
     return template("adventure.html")
@@ -96,12 +98,16 @@ def story():
     username = request.POST.get("user")
     current_adv_id = request.POST.get("adventure")
     next_story_id = request.POST.get("next")
+    energy_change= request.POST.get("energy_change")
+    bodytemp_change= request.POST.get("bodytemp_change")
+    print(bodytemp_change, energy_change)
+
     # update_user(...)
     with connectivity.cursor() as cursor:
         question, options = get_data(cursor, next_story_id, username)
-
+        bodytemp_total, energy_total = calc_measurments(cursor,bodytemp_change, energy_change, username)
     # next_steps_results = []
-    # random.shuffle(options)  # todo change - used only for demonstration purpouses
+    # random.shuffle(options)  #todo change - used only for demonstration purpouses
 
     # todo add the next step based on db
     return json.dumps({"user": username,
@@ -109,8 +115,18 @@ def story():
                        "current": next_story_id,
                        "text": question['text_q'],
                        "image": question['image'],
-                       "options": options
+                       "options": options,
+                       "energy_total": energy_total,
+                       "bodytemp_total": bodytemp_total
                        })
+
+
+def calc_measurments(cursor, bodytemp_change, energy_change, username):
+    user = get_user(cursor, username)
+    bodytemp_total = int(user['bodytemp_total']) + int(bodytemp_change)
+    energy_total = int(user['energy_total']) + int(energy_change)
+    print(bodytemp_total, energy_total)
+    return bodytemp_total, energy_total
 
 
 # "adventure": current_adv_id,

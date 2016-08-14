@@ -28,22 +28,40 @@ Adventures.bindErrorHandlers = function () {
 
 //The core function of the app, sends the user's choice and then parses the results to the server and handling the response
 Adventures.chooseOption = function(){
-    Adventures.currentStep = $(this).val();
-    console.log($(this))
+    var self = $(this);
+    Adventures.currentStep = self.val();
+    console.log($(this));
     $.ajax("/story",{
         type: "POST",
         data: {
             "user": Adventures.currentUser,
             "adventure": Adventures.currentAdventure,
-            "next": Adventures.currentStep},
+            "next": Adventures.currentStep,
+            "energy_change" : self.attr('energy_change'),
+            "bodytemp_change": self.attr('bodytemp_change')
+        },
         dataType: "json",
         contentType: "application/json",
         success: function (data) {
             $(".greeting-text").hide();
+            console.log(data);
+            console.log('data');
             Adventures.write(data);
+            Adventures.setEnergy(data["energy_total"]);
+            Adventures.setBodyTemp(data["bodytemp_total"]);
         }
     });
 };
+
+Adventures.setEnergy = function(energy_total){
+    $(".user-energy").text("Total Energy: "+ energy_total);
+    console.log('sup');
+}
+
+Adventures.setBodyTemp = function(bodytemp_total){
+    $(".user-bodytemperature").text("Total Body Temperature: "+bodytemp_total);
+    console.log('dude');
+}
 
 Adventures.write = function (message) {
     //Writing new choices and image to screen
@@ -52,8 +70,12 @@ Adventures.write = function (message) {
         var opt = $("#option_" + (i+1));
         opt.text(message['options'][i]['text_ans']);
         opt.prop("value", message['options'][i]['next_q']);
+        opt.attr('energy_change',message['options'][i]['energy_change'] );
+        opt.attr('bodytemp_change',message['options'][i]['bodytemp_change'] );
     }
     Adventures.setImage(message["image"]);
+    Adventures.setEnergy(message['energy_total']);
+    Adventures.setBodyTemp(message["bodytemp_total"]);
 };
 
 
