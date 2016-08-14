@@ -7,7 +7,7 @@ import os
 connectivity = pymysql.connect(host="localhost",
                                user="root",
                                password="",
-                               db="mydb",
+                               db="adventure",
                                cursorclass=pymysql.cursors.DictCursor)
 # current_q = 1
 # username = 'Yippy'
@@ -40,7 +40,7 @@ def start():
     with connectivity.cursor() as cursor:
         user = get_user(cursor, username)
         #print(user)
-        if user is ():
+        if user is None:
             print("something")
             user = init_user(cursor, username)
 
@@ -61,7 +61,7 @@ def start():
 
 
 def init_user(cursor, username):
-    sql = " INSERT INTO users (name, energy_total, bodytemp_total, id_q) VALUES ('{}', 100, 100, 1)".format(username)
+    sql = "INSERT INTO users (name, energy_total, bodytemp_total, id_q) VALUES (\'{}\', 100, 100, 1)".format(username)
     cursor.execute(sql)
     user = get_user(cursor, username)
     connectivity.commit()
