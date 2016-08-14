@@ -12,7 +12,7 @@ connectivity = pymysql.connect(host="localhost",
 # username = 'Yippy'
 # try:
 #     with connectivity.cursor() as cursor:
-#
+#a
 #         sql = " INSERT INTO users (name, energy_total, bodytemp_total, id_q) VALUES ('{}', 100, 100, 1)".format(username)
 #
 #         print("blah")
