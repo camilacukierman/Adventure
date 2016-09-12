@@ -10,26 +10,6 @@ connectivity = pymysql.connect(host="us-cdbr-iron-east-04.cleardb.net",
                                db="heroku_0e2c7680e7cdd9b",
                                cursorclass=pymysql.cursors.DictCursor)
 
-
-# current_q = 1
-# username = 'Yippy'
-# try:
-#     with connectivity.cursor() as cursor:
-#a
-#         sql = " INSERT INTO users (name, energy_total, bodytemp_total, id_q) VALUES ('{}', 100, 100, 1)".format(username)
-#
-#         print("blah")
-#         cursor.execute(sql)
-#         options = cursor.fetchall()
-#
-#         print(options)
-#
-# except:
-#     print("failed")
-
-
-
-
 @route("/", method="GET")
 def index():
     return template("adventure.html")
